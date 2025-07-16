@@ -22,13 +22,21 @@ async function store(req: Request, res: Response, next: NextFunction) {
       }
     }
 
-    if (payload.tags && payload.tags.length > 0) {
+    console.log("payload tags", payload.tags);
+
+    if (typeof payload.tags === "string") {
+      payload.tags = [payload.tags]; // convert single tag jadi array
+    }
+
+    if (payload.tags.length > 0) {
       const tags = await Tag.find({
         name: { $in: payload.tags.map((tag: string) => tag.trim()) },
       });
 
       if (tags.length) {
-        payload = { ...payload, tags: tags.map((tag) => tag._id) };
+        payload.tags = tags.map((tag) => tag._id);
+      } else {
+        payload.tags = []; // bersihkan jika tidak ditemukan
       }
     }
 
@@ -88,8 +96,35 @@ async function store(req: Request, res: Response, next: NextFunction) {
 
 async function index(req: Request, res: Response, next: NextFunction) {
   try {
-    const { limit = 10, skip = 0 } = req.query;
-    const products = await Product.find()
+    let criteria = {};
+    let { limit = 10, skip = 0, q = "", category = "", tags = [] } = req.query;
+
+    if (typeof q === "string" && q.length) {
+      criteria = { ...criteria, name: { $regex: q, $options: "i" } };
+    }
+
+    if (typeof category === "string" && category.length) {
+      const categoryDoc = await Category.findOne({
+        name: { $regex: category, $options: "i" },
+      });
+      if (categoryDoc) {
+        criteria = { ...criteria, category: categoryDoc._id };
+      }
+    }
+
+    if (Array.isArray(tags) && tags.length > 0) {
+      const tagDocs = await Tag.find({
+        name: { $in: tags },
+      });
+      if (tagDocs.length) {
+        criteria = {
+          ...criteria,
+          tags: { $in: tagDocs.map((tag) => tag._id) },
+        };
+      }
+    }
+
+    const products = await Product.find(criteria)
       .limit(parseInt(limit as string))
       .skip(parseInt(skip as string))
       .populate("category", "name")
@@ -121,13 +156,19 @@ async function update(req: Request, res: Response, next: NextFunction) {
       }
     }
 
-    if (payload.tags && payload.tags.length > 0) {
+    if (typeof payload.tags === "string") {
+      payload.tags = [payload.tags]; // convert single tag jadi array
+    }
+
+    if (payload.tags.length > 0) {
       const tags = await Tag.find({
         name: { $in: payload.tags.map((tag: string) => tag.trim()) },
       });
 
       if (tags.length) {
-        payload = { ...payload, tags: tags.map((tag) => tag._id) };
+        payload.tags = tags.map((tag) => tag._id);
+      } else {
+        payload.tags = []; // bersihkan jika tidak ditemukan
       }
     }
 

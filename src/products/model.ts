@@ -17,10 +17,6 @@ const productSchema = new Schema(
       type: String,
       maxlength: [1000, "Panjang deskripsi maksimal 1000 karakter"],
     },
-    stok: {
-      type: Number,
-      default: 0,
-    },
     image_url: {
       type: String,
       required: [true, "Gambar produk harus diisi"],
