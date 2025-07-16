@@ -1,10 +1,15 @@
 import Router from "express";
 import os from "os";
 import multer from "multer";
-import { store, index } from "./controller";
+import { store, index, update } from "./controller";
 
 const router = Router();
 router.post("/products", multer({ dest: os.tmpdir() }).single("image"), store);
 router.get("/products", index);
+router.put(
+  "/products/:id",
+  multer({ dest: os.tmpdir() }).single("image"),
+  update
+);
 
 export default router;

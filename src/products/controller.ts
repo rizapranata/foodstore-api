@@ -23,10 +23,14 @@ async function store(req: Request, res: Response, next: NextFunction) {
       src.on("end", async () => {
         const product = new Product({
           ...payload,
-          image: filename,
+          image_url: filename,
         });
         await product.save();
-        return res.json(product);
+        return res.status(201).json({
+          status: "success",
+          message: "Product created successfully",
+          data: product,
+        });
       });
 
       src.on("error", (err) => {
@@ -60,7 +64,10 @@ async function store(req: Request, res: Response, next: NextFunction) {
 
 async function index(req: Request, res: Response, next: NextFunction) {
   try {
-    const products = await Product.find();
+    const { limit = 10, skip = 0 } = req.query;
+    const products = await Product.find()
+      .limit(parseInt(limit as string))
+      .skip(parseInt(skip as string));
     res.status(200).json({
       status: "success",
       data: products,
@@ -68,7 +75,74 @@ async function index(req: Request, res: Response, next: NextFunction) {
   } catch (error) {
     next(error);
   }
-
 }
 
-export { store, index };
+async function update(req: Request, res: Response, next: NextFunction) {
+  try {
+    const payload = req.body;
+    const productId = req.params.id;
+
+    if (req.file) {
+      const tmp_path = req.file.path;
+      const originalExt =
+        req.file.originalname.split(".")[
+          req.file.originalname.split(".").length - 1
+        ];
+      const filename = req.file.filename + "." + originalExt;
+      const targetPath = path.resolve(UPLOAD_DIR, filename);
+
+      const src = fs.createReadStream(tmp_path);
+      const dest = fs.createWriteStream(targetPath);
+      src.pipe(dest);
+      src.on("end", async () => {
+        let product = await Product.findOne({ _id: productId });
+        const currentImage = `${UPLOAD_DIR}${product?.image_url}`;
+        if (fs.existsSync(currentImage)) {
+          fs.unlinkSync(currentImage);
+        }
+
+        product = await Product.findByIdAndUpdate(
+          { _id: productId },
+          {
+            ...payload,
+            image_url: filename,
+          },
+          { new: true, runValidators: true }
+        );
+
+        return res.json(product);
+      });
+
+      src.on("error", (err) => {
+        fs.unlinkSync(tmp_path);
+        return res.status(500).json({
+          error: 1,
+          message: "Failed to upload image",
+          details: err.message,
+        });
+      });
+    } else {
+      let product = await Product.findByIdAndUpdate(
+        { _id: productId },
+        payload,
+        { new: true, runValidators: true }
+      );
+      res.status(200).json({
+        status: "success",
+        message: "Product updated successfully",
+        data: product,
+      });
+    }
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        error: 1,
+        message: "Validation error",
+        fields: error.errors,
+      });
+    }
+    next(error);
+  }
+}
+
+export { store, index, update };
