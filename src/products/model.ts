@@ -25,10 +25,18 @@ const productSchema = new Schema(
       type: String,
       required: [true, "Gambar produk harus diisi"],
     },
+    // ------- relation one-to-one with Category ----//
     category: {
       type: Schema.Types.ObjectId,
       ref: "Category",
-    }
+    },
+    // ------- relation one-to-many with Tag ----//
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
   },
   {
     timestamps: true,

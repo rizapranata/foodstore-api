@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Product from "./model";
+import Tag from "../tag/model";
 import Category from "../category/model";
 import { Request, Response, NextFunction } from "express";
 import path from "path";
@@ -18,6 +19,16 @@ async function store(req: Request, res: Response, next: NextFunction) {
         payload = { ...payload, category: category._id };
       } else {
         delete payload.category; // Remove category if not found
+      }
+    }
+
+    if (payload.tags && payload.tags.length > 0) {
+      const tags = await Tag.find({
+        name: { $in: payload.tags.map((tag: string) => tag.trim()) },
+      });
+
+      if (tags.length) {
+        payload = { ...payload, tags: tags.map((tag) => tag._id) };
       }
     }
 
@@ -80,7 +91,10 @@ async function index(req: Request, res: Response, next: NextFunction) {
     const { limit = 10, skip = 0 } = req.query;
     const products = await Product.find()
       .limit(parseInt(limit as string))
-      .skip(parseInt(skip as string));
+      .skip(parseInt(skip as string))
+      .populate("category", "name")
+      .populate("tags", "name");
+
     res.status(200).json({
       status: "success",
       data: products,
@@ -104,6 +118,16 @@ async function update(req: Request, res: Response, next: NextFunction) {
         payload = { ...payload, category: category._id };
       } else {
         delete payload.category; // Remove category if not found
+      }
+    }
+
+    if (payload.tags && payload.tags.length > 0) {
+      const tags = await Tag.find({
+        name: { $in: payload.tags.map((tag: string) => tag.trim()) },
+      });
+
+      if (tags.length) {
+        payload = { ...payload, tags: tags.map((tag) => tag._id) };
       }
     }
 
