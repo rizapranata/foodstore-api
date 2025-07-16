@@ -1,4 +1,3 @@
-// src/index.ts
 import express from "express";
 import { logger } from "./application/logging";
 import { connectDB } from "./database";
