@@ -58,4 +58,17 @@ async function store(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store };
+async function index(req: Request, res: Response, next: NextFunction) {
+  try {
+    const products = await Product.find();
+    res.status(200).json({
+      status: "success",
+      data: products,
+    });
+  } catch (error) {
+    next(error);
+  }
+
+}
+
+export { store, index };
