@@ -25,6 +25,10 @@ const productSchema = new Schema(
       type: String,
       required: [true, "Gambar produk harus diisi"],
     },
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+    }
   },
   {
     timestamps: true,

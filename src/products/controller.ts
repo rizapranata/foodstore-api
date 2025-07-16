@@ -1,5 +1,6 @@
 import mongoose from "mongoose";
 import Product from "./model";
+import Category from "../category/model";
 import { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
@@ -7,7 +8,19 @@ import { UPLOAD_DIR } from "../config";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
-    const payload = req.body;
+    let payload = req.body;
+    if (payload.category) {
+      const category = await Category.findOne({
+        name: { $regex: payload.category, $options: "i" },
+      });
+
+      if (category) {
+        payload = { ...payload, category: category._id };
+      } else {
+        delete payload.category; // Remove category if not found
+      }
+    }
+
     if (req.file) {
       const tmp_path = req.file.path;
       const originalExt =
@@ -79,8 +92,20 @@ async function index(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
-    const payload = req.body;
+    let payload = req.body;
     const productId = req.params.id;
+
+    if (payload.category) {
+      const category = await Category.findOne({
+        name: { $regex: payload.category, $options: "i" },
+      });
+
+      if (category) {
+        payload = { ...payload, category: category._id };
+      } else {
+        delete payload.category; // Remove category if not found
+      }
+    }
 
     if (req.file) {
       const tmp_path = req.file.path;
