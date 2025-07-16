@@ -21,7 +21,10 @@ const productSchema = new Schema(
       type: Number,
       default: 0,
     },
-    image_url: String,
+    image_url: {
+      type: String,
+      required: [true, "Gambar produk harus diisi"],
+    },
   },
   {
     timestamps: true,

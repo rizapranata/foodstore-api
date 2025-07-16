@@ -101,7 +101,7 @@ async function update(req: Request, res: Response, next: NextFunction) {
           fs.unlinkSync(currentImage);
         }
 
-        product = await Product.findByIdAndUpdate(
+        product = await Product.findOneAndUpdate(
           { _id: productId },
           {
             ...payload,
@@ -110,7 +110,12 @@ async function update(req: Request, res: Response, next: NextFunction) {
           { new: true, runValidators: true }
         );
 
-        return res.json(product);
+        console.log("payload update", payload);
+
+        return res.status(200).json({
+          status: "success",
+          data: product,
+        });
       });
 
       src.on("error", (err) => {
@@ -122,7 +127,7 @@ async function update(req: Request, res: Response, next: NextFunction) {
         });
       });
     } else {
-      let product = await Product.findByIdAndUpdate(
+      let product = await Product.findOneAndUpdate(
         { _id: productId },
         payload,
         { new: true, runValidators: true }
@@ -145,4 +150,31 @@ async function update(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store, index, update };
+async function destroy(req: Request, res: Response, next: NextFunction) {
+  try {
+    const productId = req.params.id;
+    const product = await Product.findByIdAndDelete(productId);
+    const currentImage = `${UPLOAD_DIR}${product?.image_url}`;
+
+    if (!product) {
+      return res.status(404).json({
+        error: 1,
+        message: "Product not found",
+      });
+    }
+
+    if (fs.existsSync(currentImage)) {
+      fs.unlinkSync(currentImage);
+    }
+
+    res.status(200).json({
+      status: "success",
+      message: "Product deleted successfully",
+      data: product,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { store, index, update, destroy };
