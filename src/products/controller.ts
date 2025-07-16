@@ -22,8 +22,6 @@ async function store(req: Request, res: Response, next: NextFunction) {
       }
     }
 
-    console.log("payload tags", payload.tags);
-
     if (typeof payload.tags === "string") {
       payload.tags = [payload.tags]; // convert single tag jadi array
     }
@@ -46,6 +44,16 @@ async function store(req: Request, res: Response, next: NextFunction) {
         req.file.originalname.split(".")[
           req.file.originalname.split(".").length - 1
         ];
+
+      const allowedExt = ["jpg", "jpeg", "png", "gif"];
+      if (!allowedExt.includes(originalExt)) {
+        return res.status(400).json({
+          error: 1,
+          message: "Invalid image format",
+          allowed: allowedExt,
+        });
+      }
+
       const filename = req.file.filename + "." + originalExt;
       const targetPath = path.resolve(UPLOAD_DIR, filename);
 
@@ -178,6 +186,16 @@ async function update(req: Request, res: Response, next: NextFunction) {
         req.file.originalname.split(".")[
           req.file.originalname.split(".").length - 1
         ];
+
+      const allowedExt = ["jpg", "jpeg", "png", "gif"];
+      if (!allowedExt.includes(originalExt)) {
+        return res.status(400).json({
+          error: 1,
+          message: "Invalid image format",
+          allowed: allowedExt,
+        });
+      }
+
       const filename = req.file.filename + "." + originalExt;
       const targetPath = path.resolve(UPLOAD_DIR, filename);
 
@@ -199,8 +217,6 @@ async function update(req: Request, res: Response, next: NextFunction) {
           },
           { new: true, runValidators: true }
         );
-
-        console.log("payload update", payload);
 
         return res.status(200).json({
           status: "success",
