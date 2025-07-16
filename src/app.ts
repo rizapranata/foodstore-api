@@ -4,6 +4,7 @@ import { connectDB } from "./database";
 import { loging } from "./middleware/log";
 import producRouter from "./products/router";
 import categoryRouter from "./category/router";
+import tagRouter from "./tag/router";
 
 const app = express();
 const port = 3000;
@@ -15,6 +16,7 @@ app.use(express.json());
 
 app.use("/api", producRouter);
 app.use("/api", categoryRouter);
+app.use("/api", tagRouter);
 
 app.listen(port, () => {
   logger.info(`🚀 Server is running on port ${port}`);
