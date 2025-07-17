@@ -17,11 +17,11 @@ app.use(loging);
 app.use(express.json());
 app.use(decodeToken());
 
+app.use("/auth", authRouter);
 app.use("/api", producRouter);
 app.use("/api", categoryRouter);
 app.use("/api", tagRouter);
 
-app.use("/auth", authRouter);
 
 app.listen(port, () => {
   logger.info(`🚀 Server is running on port ${port}`);

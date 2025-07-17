@@ -85,4 +85,17 @@ async function login(req: Request, res: Response, next: NextFunction) {
   })(req, res, next);
 }
 
-export { register, localStrategy, login };
+function me(req: Request, res: Response) {
+  const user = req.user;
+  if (!user) {
+    return res
+      .status(401)
+      .json({ error: 1, message: "Your're not login or token expired" });
+  }
+  return res.status(200).json({
+    message: "User data retrieved successfully",
+    data: user,
+  });
+}
+
+export { register, localStrategy, login, me };
