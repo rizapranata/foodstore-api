@@ -25,6 +25,8 @@ const userSchema = new Schema(
       required: [true, "Email harus diisi"],
       maxlength: [255, "Panjang email maksimal 255 karakter"],
       unique: [true, "Email sudah terdaftar"],
+      lowercase: true,
+      trim: true,
       validate: {
         validator: function (v: string) {
           return /^[\w-]+(\.[\w-]+)*@([\w-]+\.)+[a-zA-Z]{2,7}$/.test(v);
