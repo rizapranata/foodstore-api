@@ -5,6 +5,7 @@ import jwt from "jsonwebtoken";
 import bcrypt from "bcrypt";
 import passport from "passport";
 import { SECRET_KEY } from "../config";
+import getToken from "../utils/getToken";
 
 export interface UserDocument extends mongoose.Document {
   _id: string;
@@ -74,7 +75,7 @@ async function login(req: Request, res: Response, next: NextFunction) {
     const signed = jwt.sign(user, SECRET_KEY);
     await User.findOneAndUpdate(
       { _id: user._id },
-      { $push: { token: signed } },
+      { $addToSet: { token: signed } },
       { new: true }
     );
 
@@ -98,4 +99,26 @@ function me(req: Request, res: Response) {
   });
 }
 
-export { register, localStrategy, login, me };
+async function logout(req: Request, res: Response, next: NextFunction) {
+  try {
+    const token = getToken(req);
+    const user = await User.findOneAndUpdate(
+      { token: { $in: [token] } },
+      { $pull: { token: token } },
+      { useFindAndModify: false }
+    );
+
+    if (!user || !token) {
+      return res.status(401).json({
+        error: 1,
+        message: "Unauthorized",
+      });
+    }
+
+    return res.status(200).json({ message: "Logout successful" });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { register, localStrategy, login, me, logout };
