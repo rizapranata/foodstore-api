@@ -1,9 +1,19 @@
 import { Request, Response, NextFunction } from "express";
 import Category from "./model";
 import mongoose from "mongoose";
+import UserTypes from "../utils/userTypes";
+import { policyFor } from "../policy";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("create", "Category")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to create a category",
+      });
+    }
+
     const payload = req.body;
     const category = new Category(payload);
     await category.save();
@@ -25,6 +35,14 @@ async function store(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("update", "Category")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to update a category",
+      });
+    }
+
     const { id } = req.params;
     const payload = req.body;
 
@@ -51,6 +69,14 @@ async function update(req: Request, res: Response, next: NextFunction) {
 
 async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("delete", "Category")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to delete a category",
+      });
+    }
+
     const { id } = req.params;
     const category = await Category.findOneAndDelete({ _id: id });
 

@@ -12,7 +12,7 @@ import UserTypes from "../utils/userTypes";
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
     console.log("User Role:", req.user);
-    
+
     const policy = policyFor(req.user as UserTypes);
     if (!policy.can("create", "Product")) {
       return res.status(403).json({
@@ -161,6 +161,14 @@ async function index(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("update", "Product")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to update a product",
+      });
+    }
+
     let payload = req.body;
     const productId = req.params.id;
 
@@ -180,12 +188,12 @@ async function update(req: Request, res: Response, next: NextFunction) {
       payload.tags = [payload.tags]; // convert single tag jadi array
     }
 
-    if (payload.tags.length > 0) {
+    if (payload.tags?.length > 0) {
       const tags = await Tag.find({
         name: { $in: payload.tags.map((tag: string) => tag.trim()) },
       });
 
-      if (tags.length) {
+      if (tags?.length) {
         payload.tags = tags.map((tag) => tag._id);
       } else {
         payload.tags = []; // bersihkan jika tidak ditemukan
@@ -250,6 +258,7 @@ async function update(req: Request, res: Response, next: NextFunction) {
         payload,
         { new: true, runValidators: true }
       );
+
       res.status(200).json({
         status: "success",
         message: "Product updated successfully",
@@ -270,6 +279,14 @@ async function update(req: Request, res: Response, next: NextFunction) {
 
 async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("delete", "Product")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to delete a product",
+      });
+    }
+
     const productId = req.params.id;
     const product = await Product.findByIdAndDelete(productId);
     const currentImage = `${UPLOAD_DIR}${product?.image_url}`;

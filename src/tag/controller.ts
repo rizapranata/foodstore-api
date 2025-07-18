@@ -1,9 +1,19 @@
 import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import Tag from "./model";
+import { policyFor } from "../policy";
+import UserTypes from "../utils/userTypes";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("create", "Tag")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to create a tag",
+      });
+    }
+
     const payload = req.body;
     const tag = new Tag(payload);
     await tag.save();
@@ -25,6 +35,14 @@ async function store(req: Request, res: Response, next: NextFunction) {
 
 async function update(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("update", "Tag")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to update a tag",
+      });
+    }
+
     const { id } = req.params;
     const payload = req.body;
 
@@ -58,6 +76,14 @@ async function update(req: Request, res: Response, next: NextFunction) {
 
 async function destroy(req: Request, res: Response, next: NextFunction) {
   try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("delete", "Tag")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to delete a tag",
+      });
+    }
+    
     const { id } = req.params;
     let tag = await Tag.findOneAndDelete({ _id: id });
 

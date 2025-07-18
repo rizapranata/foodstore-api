@@ -14,6 +14,8 @@ type Subjects =
   | "Cart"
   | "DeliveryAddress"
   | "Invoice"
+  | "Category"
+  | "Tag"
   | "all";
 
 export type AppAbility = MongoAbility<[Actions, Subjects], Record<string, any>>;
@@ -38,6 +40,14 @@ const definePoliciesFor = {
     can("read", "Product", { user_id: userId });
     can("update", "Product", { user_id: userId });
     can("delete", "Product", { user_id: userId });
+    can("read", "Category");
+    can("create", "Category", { user_id: userId });
+    can("update", "Category", { user_id: userId });
+    can("delete", "Category", { user_id: userId });
+    can("read", "Tag");
+    can("create", "Tag", { user_id: userId });
+    can("update", "Tag", { user_id: userId });
+    can("delete", "Tag", { user_id: userId });
     can("view", "Order");
     can("create", "Order");
     can("read", "Order", { user_id: userId });
