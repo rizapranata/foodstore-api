@@ -6,9 +6,21 @@ import { Request, Response, NextFunction } from "express";
 import path from "path";
 import fs from "fs";
 import { UPLOAD_DIR } from "../config";
+import { policyFor } from "../policy";
+import UserTypes from "../utils/userTypes";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
+    console.log("User Role:", req.user);
+    
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("create", "Product")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to create a product",
+      });
+    }
+
     let payload = req.body;
     if (payload.category) {
       const category = await Category.findOne({
