@@ -11,8 +11,6 @@ import UserTypes from "../utils/userTypes";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
-    console.log("User Role:", req.user);
-
     const policy = policyFor(req.user as UserTypes);
     if (!policy.can("create", "Product")) {
       return res.status(403).json({
@@ -144,6 +142,7 @@ async function index(req: Request, res: Response, next: NextFunction) {
       }
     }
 
+    const count = await Product.countDocuments(criteria);
     const products = await Product.find(criteria)
       .limit(parseInt(limit as string))
       .skip(parseInt(skip as string))
@@ -153,6 +152,7 @@ async function index(req: Request, res: Response, next: NextFunction) {
     res.status(200).json({
       status: "success",
       data: products,
+      count,
     });
   } catch (error) {
     next(error);
