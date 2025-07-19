@@ -7,6 +7,7 @@ import categoryRouter from "./category/router";
 import tagRouter from "./tag/router";
 import authRouter from "./auth/router";
 import decodeToken from "./middleware/decodeToken";
+import regionRouter from "./region/router";
 
 const app = express();
 const port = 3000;
@@ -21,7 +22,7 @@ app.use("/auth", authRouter);
 app.use("/api", producRouter);
 app.use("/api", categoryRouter);
 app.use("/api", tagRouter);
-
+app.use("/api", regionRouter);
 
 app.listen(port, () => {
   logger.info(`🚀 Server is running on port ${port}`);

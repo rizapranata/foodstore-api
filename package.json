@@ -15,6 +15,7 @@
   "dependencies": {
     "@casl/ability": "^6.7.3",
     "bcrypt": "^6.0.0",
+    "csvtojson": "^2.0.10",
     "dotenv": "^17.2.0",
     "express": "^5.1.0",
     "jsonwebtoken": "^9.0.2",
