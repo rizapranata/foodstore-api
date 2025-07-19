@@ -17,11 +17,22 @@ const productSchema = new Schema(
       type: String,
       maxlength: [1000, "Panjang deskripsi maksimal 1000 karakter"],
     },
-    stok: {
-      type: Number,
-      default: 0,
+    image_url: {
+      type: String,
+      required: [true, "Gambar produk harus diisi"],
     },
-    image_url: String,
+    // ------- relation one-to-one with Category ----//
+    category: {
+      type: Schema.Types.ObjectId,
+      ref: "Category",
+    },
+    // ------- relation one-to-many with Tag ----//
+    tags: [
+      {
+        type: Schema.Types.ObjectId,
+        ref: "Tag",
+      },
+    ],
   },
   {
     timestamps: true,

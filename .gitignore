@@ -1,3 +1,4 @@
 node_modules/
 docker-notes.md
+public/uploads/
 .env

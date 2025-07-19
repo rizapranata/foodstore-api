@@ -13,6 +13,7 @@ process.env.DB_PORT = process.env.DB_PORT || '27017';
 process.env.DB_NAME = process.env.DB_NAME || 'foodstore';
 process.env.DB_USER = process.env.DB_USER || 'rizapranata';
 process.env.DB_PASS = process.env.DB_PASS || 'rahasia';
+process.env.SECRET_KEY = process.env.SECRET_KEY || 'supersecretkey';
 
 const UPLOAD_DIR = path.join(__dirname, '../public/uploads/');
 const SERVICE_NAME = process.env.SERVICE_NAME;
@@ -22,11 +23,13 @@ const DB_PORT = process.env.DB_PORT;
 const DB_NAME = process.env.DB_NAME;
 const DB_USER = process.env.DB_USER;
 const DB_PASS = process.env.DB_PASS;
+const SECRET_KEY = process.env.SECRET_KEY;
 
 export {
   SERVICE_NAME,
   SERVICE_PORT,
   UPLOAD_DIR,
+  SECRET_KEY,
   DB_HOST,
   DB_PORT,
   DB_NAME,

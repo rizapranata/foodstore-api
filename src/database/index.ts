@@ -1,7 +1,7 @@
 // src/database/index.ts
 import mongoose from "mongoose";
 import { DB_HOST, DB_NAME, DB_PASS, DB_PORT, DB_USER } from "../config";
-import { logger } from "../application/logging";
+import { logger } from "../utils/logging";
 
 const uri = `mongodb://${DB_USER}:${DB_PASS}@${DB_HOST}:${DB_PORT}/${DB_NAME}?authSource=admin`;
 
