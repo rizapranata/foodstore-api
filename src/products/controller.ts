@@ -7,7 +7,7 @@ import path from "path";
 import fs from "fs";
 import { UPLOAD_DIR } from "../config";
 import { policyFor } from "../policy";
-import UserTypes from "../utils/userTypes";
+import { UserTypes } from "../types/user.types";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {

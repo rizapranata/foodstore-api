@@ -1,4 +1,4 @@
-export default interface UserTypes {
+export interface UserTypes {
   _id: string;
   full_name: string;
   email: string;

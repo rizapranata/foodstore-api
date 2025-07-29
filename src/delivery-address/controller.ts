@@ -2,7 +2,7 @@ import DeliveryAddress from "./model";
 import { Request, Response, NextFunction } from "express";
 import { policyFor } from "../policy";
 import mongoose from "mongoose";
-import UserTypes from "../utils/userTypes";
+import { UserTypes } from "../types/user.types";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   const policy = policyFor(req.user as UserTypes);
