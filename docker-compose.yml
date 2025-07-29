@@ -1,0 +1,38 @@
+version: "3.8"
+
+services:
+  backend:
+    build: .
+    container_name: foodstode-api
+    ports:
+      - "5000:5000"
+    environment:
+      - MONGO_URI=mongodb://mongo:27017/myapp
+      - NODE_ENV=development
+    depends_on:
+      - mongo
+    volumes:
+      - .:/app
+    networks:
+      - backend-network
+
+  mongo:
+    image: mongo:6.0
+    container_name: mongodb
+    restart: unless-stopped
+    ports:
+      - "27017:27017"
+    environment:
+      - MONGO_INITDB_ROOT_USERNAME=${MONGODB_USERNAME}
+      - MONGO_INITDB_ROOT_PASSWORD=${MONGODB_PASS}
+    volumes:
+      - mongo-data:/data/db
+    networks:
+      - backend-network
+
+volumes:
+  mongo-data:
+
+networks:
+  backend-network:
+    driver: bridge

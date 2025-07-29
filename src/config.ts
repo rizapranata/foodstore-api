@@ -14,6 +14,8 @@ process.env.DB_NAME = process.env.DB_NAME || 'foodstore';
 process.env.DB_USER = process.env.DB_USER || 'rizapranata';
 process.env.DB_PASS = process.env.DB_PASS || 'rahasia';
 process.env.SECRET_KEY = process.env.SECRET_KEY || 'supersecretkey';
+process.env.MONGO_INITDB_ROOT_USERNAME = process.env.MONGO_INITDB_ROOT_USERNAME;
+process.env.MONGO_INITDB_ROOT_PASSWORD = process.env.MONGO_INITDB_ROOT_PASSWORD;
 
 const UPLOAD_DIR = path.join(__dirname, '../public/uploads/');
 const SERVICE_NAME = process.env.SERVICE_NAME;
@@ -24,6 +26,8 @@ const DB_NAME = process.env.DB_NAME;
 const DB_USER = process.env.DB_USER;
 const DB_PASS = process.env.DB_PASS;
 const SECRET_KEY = process.env.SECRET_KEY;
+const MONGODB_USERNAME = process.env.MONGO_INITDB_ROOT_PASSWORD
+const MONGODB_PASS = process.env.MONGO_INITDB_ROOT_PASSWORD
 
 export {
   SERVICE_NAME,
@@ -35,4 +39,6 @@ export {
   DB_NAME,
   DB_USER,
   DB_PASS,
+  MONGODB_PASS,
+  MONGODB_USERNAME
 }
