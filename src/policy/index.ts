@@ -4,7 +4,7 @@ import {
   MongoAbility,
   AbilityClass,
 } from "@casl/ability";
-import UserTypes from "../utils/userTypes"; // pastikan ini sesuai
+import { UserTypes } from "../types/user.types"; // pastikan ini sesuai
 
 type Actions = "manage" | "create" | "read" | "update" | "delete" | "view";
 type Subjects =

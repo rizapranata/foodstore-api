@@ -1,7 +1,7 @@
 import { Request, Response, NextFunction } from "express";
 import Category from "./model";
 import mongoose from "mongoose";
-import UserTypes from "../utils/userTypes";
+import { UserTypes } from "../types/user.types";
 import { policyFor } from "../policy";
 
 async function store(req: Request, res: Response, next: NextFunction) {

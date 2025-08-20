@@ -4,6 +4,7 @@ import { Request, Response, NextFunction } from "express";
 import { ProductTypes } from "../types/product.types";
 import { UserTypes } from "../types/user.types";
 import Product from "../products/model";
+import CartItem from "../cart-item/model";
 
 async function update(req: Request, res: Response, next: NextFunction) {
   const policy = policyFor(req.user as UserTypes);
@@ -35,6 +36,18 @@ async function update(req: Request, res: Response, next: NextFunction) {
       };
     });
 
+    await CartItem.bulkWrite(
+      cartItems.map((item: ProductTypes) => {
+        return {
+          updateOne: {
+            filter: { user: user._id, product: item._id },
+            update: item,
+            upsert: true, // Create if it doesn't exist
+          },
+        };
+      })
+    );
+
     return res.status(200).json({
       status: "success",
       data: cartItems,
@@ -50,4 +63,34 @@ async function update(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { update };
+async function index(req: Request, res: Response, next: NextFunction) {
+  const policy = policyFor(req.user as UserTypes);
+  if (!policy.can("read", "Cart")) {
+    return res.status(403).json({
+      error: 1,
+      message: "You are not allowed to view this cart",
+    });
+  }
+
+  try {
+    const user = req.user as UserTypes;
+    const cartItems = await CartItem.find({ user: user._id })
+      .populate("product_id")
+      .exec();
+
+    return res.status(200).json({
+      status: "success",
+      data: cartItems,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export { update, index };
