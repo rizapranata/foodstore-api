@@ -1,7 +1,10 @@
-import mongoose from "mongoose";
-const { model, Schema } = mongoose;
+import mongoose, { Model, Schema, Document } from "mongoose";
 
-const tagSchema = new Schema({
+export interface TagTypes extends Document {
+  name: string;
+}
+
+const tagSchema = new Schema<TagTypes>({
   name: {
     type: String,
     required: [true, "Nama tag harus diisi"],
@@ -10,4 +13,6 @@ const tagSchema = new Schema({
   },
 });
 
-export default model("Tag", tagSchema);
+const Tag: Model<TagTypes> =
+  mongoose.models.Tag || mongoose.model<TagTypes>("Tag", tagSchema);
+export default Tag;

@@ -21,7 +21,7 @@ async function update(req: Request, res: Response, next: NextFunction) {
     const productIds = items.map((item: ProductTypes) => item._id);
     const products = await Product.find({ _id: { $in: productIds } });
     const cartItems = items.map((item: ProductTypes) => {
-      const product = products.find((p) => p._id.toString() === item._id);
+      const product = products.find((p) => p._id === item._id);
       if (!product) {
         return null;
       }
