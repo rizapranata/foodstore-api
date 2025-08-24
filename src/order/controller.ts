@@ -76,4 +76,34 @@ async function store(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store };
+async function index(req: Request, res: Response, next: NextFunction) {
+  try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("read", "Order")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to view orders",
+      });
+    }
+    
+    const { limit = 10, skip = 0 } = req.query;
+    const user = req.user as UserTypes;
+    const count = await Order.countDocuments({ user: user._id });
+    const orders = await Order.find({ user: user._id })
+      .populate("order_items")
+      .populate("user")
+      .limit(Number(limit))
+      .skip(Number(skip))
+      .sort({ createdAt: -1 });
+
+    return res.status(200).json({
+      status: "success",
+      data: orders.map((order) => order.toJSON({ virtuals: true })), // karena schema Order memiliki field virtual yaitu items_count
+      count,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+export { store, index };
