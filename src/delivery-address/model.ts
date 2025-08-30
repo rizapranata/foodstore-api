@@ -3,10 +3,10 @@ import mongoose, { Document, Schema, Model } from "mongoose";
 // 1. Definisikan interface untuk TypeScript
 export interface DeliveryAddressDocument extends Document {
   name: string;
-  village: string;
-  province: string;
-  regency: string;
-  district: string;
+  kelurahan: string;
+  provinsi: string;
+  kabupaten: string;
+  kecamatan: string;
   detail: string;
   user: mongoose.Types.ObjectId;
 }
@@ -20,22 +20,22 @@ const deliveryAddressSchema = new Schema<DeliveryAddressDocument>(
       minlength: [3, "Nama penerima terlalu pendek"],
       maxlength: [225, "Nama penerima terlalu panjang"],
     },
-    village: {
+    kelurahan: {
       type: String,
       required: [true, "Kelurahan harus diisi"],
       maxlength: [255, "Panjang maksimal kelurahan adalah 255 karakter"],
     },
-    province: {
+    provinsi: {
       type: String,
       required: [true, "Provinsi harus diisi"],
       maxlength: [255, "Panjang maksimal provinsi adalah 255 karakter"],
     },
-    regency: {
+    kabupaten: {
       type: String,
       required: [true, "Kabupaten/Kota harus diisi"],
       maxlength: [255, "Panjang maksimal kabupaten adalah 255 karakter"],
     },
-    district: {
+    kecamatan: {
       type: String,
       required: [true, "Kecamatan harus diisi"],
       maxlength: [255, "Panjang maksimal kecamatan adalah 255 karakter"],

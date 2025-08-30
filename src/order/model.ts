@@ -1,6 +1,7 @@
 import mongoose, { Schema, Model, Document } from "mongoose";
 import AutoIncrementFactory from "mongoose-sequence";
 import { ProductTypes } from "../types/product.types";
+import InvoiceModel from "../invoice/model";
 
 const AutoIncrement = AutoIncrementFactory(mongoose.connection as any);
 
@@ -69,6 +70,25 @@ orderSchema.virtual("items_count").get(function (this: any) {
     (total: number, item: ProductTypes) => total + (item.qty || 0),
     0
   );
+});
+
+// Create an invoice after saving the order
+orderSchema.post("save", async function (doc: OrderTypes) {
+  const sub_total = this.order_items.reduce(
+    (total: number, item: any) => total + item.price * item.qty,
+    0
+  );
+
+  const invoice = new InvoiceModel({
+    user: doc.user,
+    order: doc._id,
+    sub_total,
+    delivery_fee: doc.delivery_fee,
+    total: sub_total + doc.delivery_fee,
+    delivery_address: doc.delivery_address,
+  });
+
+  await invoice.save();
 });
 
 const Order: Model<OrderTypes> =

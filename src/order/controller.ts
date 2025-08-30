@@ -36,10 +36,10 @@ async function store(req: Request, res: Response, next: NextFunction) {
       user: user._id,
       delivery_fee,
       delivery_address: {
-        provinsi: address?.province,
-        kabupaten: address?.regency,
-        kecamatan: address?.district,
-        kelurahan: address?.village,
+        provinsi: address?.provinsi,
+        kabupaten: address?.kabupaten,
+        kecamatan: address?.kecamatan,
+        kelurahan: address?.kelurahan,
         detail: address?.detail,
       },
     });
@@ -85,7 +85,7 @@ async function index(req: Request, res: Response, next: NextFunction) {
         message: "You are not allowed to view orders",
       });
     }
-    
+
     const { limit = 10, skip = 0 } = req.query;
     const user = req.user as UserTypes;
     const count = await Order.countDocuments({ user: user._id });
