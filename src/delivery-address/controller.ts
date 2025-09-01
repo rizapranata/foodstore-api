@@ -19,7 +19,7 @@ async function store(req: Request, res: Response, next: NextFunction) {
 
     const address = new DeliveryAddress({
       ...payload,
-      user: user._id,
+      user: user._id
     });
 
     await address.save();

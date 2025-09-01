@@ -1,4 +1,4 @@
-import Router from "express";
+import { Router } from "express";
 import multer from "multer";
 import passport from "passport";
 import passportLocal from "passport-local";

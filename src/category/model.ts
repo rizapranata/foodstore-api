@@ -1,7 +1,10 @@
-import mongoose from "mongoose";
-const { model, Schema } = mongoose;
+import mongoose, { Model, Schema, Document } from "mongoose";
 
-const categorySchema = new Schema(
+export interface CategoryTypes extends Document {
+  name: string;
+}
+
+const categorySchema = new Schema<CategoryTypes>(
   {
     name: {
       type: String,
@@ -15,4 +18,7 @@ const categorySchema = new Schema(
   }
 );
 
-export default model("Category", categorySchema);
+const Category: Model<CategoryTypes> =
+  mongoose.models.Category ||
+  mongoose.model<CategoryTypes>("Category", categorySchema);
+export default Category;

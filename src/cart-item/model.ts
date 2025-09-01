@@ -1,7 +1,15 @@
-import mongoose from "mongoose";
-const { model, Schema } = mongoose;
+import mongoose, { Model, Schema, Document } from "mongoose";
 
-const cartItemSchema = new Schema(
+export interface CartItemTypes extends Document {
+  name: string;
+  qty: number;
+  price: number;
+  image_url?: string;
+  product: mongoose.Types.ObjectId;
+  user: mongoose.Types.ObjectId;
+}
+
+const cartItemSchema = new Schema<CartItemTypes>(
   {
     name: {
       type: String,
@@ -34,4 +42,7 @@ const cartItemSchema = new Schema(
   }
 );
 
-export default model("CartItem", cartItemSchema);
+const CartItem: Model<CartItemTypes> =
+  mongoose.models.CartItem ||
+  mongoose.model<CartItemTypes>("CartItem", cartItemSchema);
+export default CartItem;

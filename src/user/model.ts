@@ -1,15 +1,30 @@
-import mongoose from "mongoose";
-const { model, Schema } = mongoose;
+import mongoose, { Model, Schema, Document } from "mongoose";
 import bcrypt from "bcrypt";
 
-const counterSchema = new Schema({
+export interface UserTypes extends Document {
+  full_name: string;
+  customer_id: number;
+  email: string;
+  password: string;
+  role: string;
+  token: string[];
+}
+
+export interface counterTypes extends Document {
+  _id: string; // This will be the identifier for the counter
+  seq: number; // This will hold the sequence number
+}
+
+const counterSchema = new Schema<counterTypes>({
   _id: String,
   seq: { type: Number, default: 0 },
 });
 
-const CounterCustomerId = mongoose.model("Counter", counterSchema);
+const CounterCustomerId =
+  mongoose.models.CounterCustomerId ||
+  mongoose.model<counterTypes>("CounterCustomerId", counterSchema);
 
-const userSchema = new Schema(
+const userSchema = new Schema<UserTypes>(
   {
     full_name: {
       type: String,
@@ -81,4 +96,6 @@ userSchema.pre("save", async function (next) {
   }
 });
 
-export default model("User", userSchema);
+const User: Model<UserTypes> =
+  mongoose.models.User || mongoose.model<UserTypes>("User", userSchema);
+export default User;
