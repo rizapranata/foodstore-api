@@ -15,7 +15,7 @@ import invoiceRouter from "./invoice/router";
 import cors from "cors";
 
 const app = express();
-const port = 3000;
+const port = 5000;
 connectDB();
 
 app.use(express.urlencoded({ extended: true }));
