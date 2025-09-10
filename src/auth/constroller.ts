@@ -73,11 +73,27 @@ async function login(req: Request, res: Response, next: NextFunction) {
     }
 
     const signed = jwt.sign(user, SECRET_KEY);
-    await User.findOneAndUpdate(
+    const resultUser = await User.findOneAndUpdate(
       { _id: user._id },
       { $addToSet: { token: signed } },
       { new: true }
     );
+
+    if (!resultUser) return;
+    const role = resultUser?.role || "user";
+
+    res.cookie("token", signed, {
+      httpOnly: true,
+      secure: false, // kalau masih lokal jangan pakai true
+      sameSite: "lax", // atau "none" jika beda domain
+      path: "/",
+    });
+
+    res.cookie("role", role, {
+      httpOnly: true,
+      sameSite: "strict",
+      path: "/",
+    });
 
     return res.status(200).json({
       message: "Login successful",

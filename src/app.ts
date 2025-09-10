@@ -15,11 +15,16 @@ import invoiceRouter from "./invoice/router";
 import cors from "cors";
 
 const app = express();
-const port = 5000;
+const port = 3000;
 connectDB();
 
+const FE = {
+  origin: "http://localhost:3001", // alamat frontend (Next.js)
+  credentials: true, // penting untuk cookie
+};
+
 app.use(express.urlencoded({ extended: true }));
-app.use(cors());
+app.use(cors(FE));
 app.use(loging);
 app.use(express.json());
 app.use(decodeToken());
