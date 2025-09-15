@@ -6,6 +6,8 @@ import bcrypt from "bcrypt";
 import passport from "passport";
 import { SECRET_KEY } from "../config";
 import getToken from "../utils/getToken";
+import { policyFor } from "../policy";
+import { UserTypes } from "../types/user.types";
 
 export interface UserDocument extends mongoose.Document {
   _id: string;
@@ -137,4 +139,78 @@ async function logout(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { register, localStrategy, login, me, logout };
+async function index(req: Request, res: Response, next: NextFunction) {
+  try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("read", "User")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to read a User",
+      });
+    }
+
+    let criteria = {};
+    const { limit = 10, skip = 0, q = "" } = req.query;
+
+    if (typeof q === "string" && q.length) {
+      criteria = { ...criteria, full_name: { $regex: q, $options: "i" } };
+    }
+
+    const count = await User.countDocuments(criteria);
+    const users = await User.find(criteria)
+      .limit(Number(limit))
+      .skip(Number(skip));
+
+    res.status(200).json({
+      status: "success",
+      data: users,
+      count,
+    });
+  } catch (error) {
+    next(error);
+  }
+}
+
+async function statusUser(req: Request, res: Response, next: NextFunction) {
+  try {
+    const policy = policyFor(req.user as UserTypes);
+    if (!policy.can("update", "User")) {
+      return res.status(403).json({
+        error: 1,
+        message: "You are not allowed to update a User",
+      });
+    }
+
+    const { id } = req.params;
+    const { is_active } = req.body;
+
+    // update hanya field is_active
+    const user = await User.findOneAndUpdate(
+      { customer_id: Number(id) }, // filter cukup pakai id
+      { is_active }, // hanya update is_active
+      { new: true, runValidators: true }
+    );
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      data: user,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export { register, localStrategy, login, me, logout, index, statusUser };

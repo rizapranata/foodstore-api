@@ -8,6 +8,7 @@ export interface UserTypes extends Document {
   password: string;
   role: string;
   token: string[];
+  is_active: number;
 }
 
 export interface counterTypes extends Document {
@@ -60,6 +61,11 @@ const userSchema = new Schema<UserTypes>(
       default: "user",
     },
     token: [String],
+    is_active: {
+      type: Number,
+      enum: [0, 1],
+      default: 1,
+    },
   },
   {
     timestamps: true,
