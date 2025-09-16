@@ -3,7 +3,7 @@ import bcrypt from "bcrypt";
 
 export interface UserTypes extends Document {
   full_name: string;
-  customer_id: number;
+  user_id: number;
   email: string;
   password: string;
   role: string;
@@ -33,7 +33,7 @@ const userSchema = new Schema<UserTypes>(
       maxlength: [255, "Panjang nama harus antara 3 - 255 karakter"],
       minlength: [3, "Panjang nama harus antara 3 - 255 karakter"],
     },
-    customer_id: {
+    user_id: {
       type: Number,
     },
     email: {
@@ -88,11 +88,11 @@ userSchema.pre("save", async function (next) {
   if (this.isNew) {
     try {
       const counter = await CounterCustomerId.findByIdAndUpdate(
-        "customer_id",
+        "user_id",
         { $inc: { seq: 1 } },
         { new: true, upsert: true }
       );
-      this.customer_id = counter.seq;
+      this.user_id = counter.seq;
       next();
     } catch (err) {
       next(err as Error);

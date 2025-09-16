@@ -19,7 +19,7 @@ async function store(req: Request, res: Response, next: NextFunction) {
 
     const address = new DeliveryAddress({
       ...payload,
-      user: user._id
+      user: user._id,
     });
 
     await address.save();
@@ -84,9 +84,11 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
 
   try {
     const { id } = req.params;
+    const reqUser = req.user as UserTypes;
+
     const address = await DeliveryAddress.findOneAndDelete({
       _id: id,
-      user: (req.user as UserTypes)._id,
+      user: reqUser._id,
     });
 
     if (!address) {

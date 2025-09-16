@@ -2,8 +2,16 @@ import { Router } from "express";
 import multer from "multer";
 import passport from "passport";
 import passportLocal from "passport-local";
-import { index, localStrategy } from "./constroller";
-import { register, login, me, logout, statusUser } from "./constroller";
+import {
+  register,
+  login,
+  me,
+  logout,
+  statusUser,
+  destroy,
+  index,
+  localStrategy,
+} from "./constroller";
 
 const LocalStrategy = passportLocal.Strategy;
 const router = Router();
@@ -15,5 +23,6 @@ router.get("/me", me);
 router.post("/logout", logout);
 router.get("/users", index);
 router.put("/status/:id", multer().none(), statusUser);
+router.delete("/delete/:id", multer().none(), destroy);
 
 export default router;

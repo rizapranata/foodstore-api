@@ -186,7 +186,7 @@ async function statusUser(req: Request, res: Response, next: NextFunction) {
 
     // update hanya field is_active
     const user = await User.findOneAndUpdate(
-      { customer_id: Number(id) }, // filter cukup pakai id
+      { user_id: Number(id) }, // filter cukup pakai id
       { is_active }, // hanya update is_active
       { new: true, runValidators: true }
     );
@@ -200,7 +200,7 @@ async function statusUser(req: Request, res: Response, next: NextFunction) {
 
     return res.status(200).json({
       status: "success",
-      data: user,
+      message: "Success update status user!",
     });
   } catch (error) {
     if (error instanceof mongoose.Error.ValidationError) {
@@ -213,4 +213,50 @@ async function statusUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { register, localStrategy, login, me, logout, index, statusUser };
+async function destroy(req: Request, res: Response, next: NextFunction) {
+  const policy = policyFor(req.user as UserTypes);
+  if (!policy.can("delete", "User")) {
+    return res.status(403).json({
+      error: 1,
+      message: "You are not allowed to delete this user!",
+    });
+  }
+
+  try {
+    const { id } = req.params;
+    const user = await User.findOneAndDelete({
+      _id: id,
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found!",
+      });
+    }
+
+    return res.status(200).json({
+      status: "success",
+      message: `User ${user.full_name} deleted!`,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export {
+  register,
+  localStrategy,
+  login,
+  me,
+  logout,
+  index,
+  statusUser,
+  destroy,
+};
