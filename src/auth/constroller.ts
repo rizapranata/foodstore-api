@@ -133,6 +133,20 @@ async function logout(req: Request, res: Response, next: NextFunction) {
       });
     }
 
+    res.clearCookie("token", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+    });
+
+    res.clearCookie("role", {
+      httpOnly: true,
+      secure: false,
+      sameSite: "lax",
+      path: "/",
+    });
+
     return res.status(200).json({ message: "Logout successful" });
   } catch (error) {
     next(error);
@@ -186,7 +200,7 @@ async function statusUser(req: Request, res: Response, next: NextFunction) {
 
     // update hanya field is_active
     const user = await User.findOneAndUpdate(
-      { user_id: Number(id) }, // filter cukup pakai id
+      { _id: id }, // filter cukup pakai id
       { is_active }, // hanya update is_active
       { new: true, runValidators: true }
     );

@@ -15,11 +15,11 @@ import invoiceRouter from "./invoice/router";
 import cors from "cors";
 
 const app = express();
-const port = 3000;
+const port = 3001;
 connectDB();
 
 const FE = {
-  origin: "http://localhost:3001", // alamat frontend (Next.js)
+  origin: "http://localhost:3000", // alamat frontend (Next.js)
   credentials: true, // penting untuk cookie
 };
 
