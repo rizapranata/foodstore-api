@@ -238,4 +238,41 @@ async function statusUser(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store, update, destroy, resetPassword, index, statusUser };
+async function detailUser(req: Request, res: Response, next: NextFunction) {
+  const policy = policyFor(req.user as UserTypes);
+  if (!policy.can("read", "User")) {
+    return res.status(403).json({
+      error: 1,
+      message: "You are not allowed to create a User",
+    });
+  }
+
+  try {
+    const { id } = req.params;
+    const user = await User.findOne({
+      _id: id,
+    });
+
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found!",
+      });
+    }
+
+    return res.status(200).json({
+      message: "success get user data.",
+      data: user,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export { store, update, destroy, resetPassword, index, statusUser, detailUser };
