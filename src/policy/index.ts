@@ -16,6 +16,7 @@ type Subjects =
   | "Invoice"
   | "Category"
   | "Tag"
+  | "User"
   | "all";
 
 export type AppAbility = MongoAbility<[Actions, Subjects], Record<string, any>>;

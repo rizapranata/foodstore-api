@@ -7,7 +7,6 @@ import {
   login,
   me,
   logout,
-  statusUser,
   destroy,
   index,
   localStrategy,
@@ -22,7 +21,6 @@ router.post("/login", multer().none(), login);
 router.get("/me", me);
 router.post("/logout", logout);
 router.get("/users", index);
-router.put("/status/:id", multer().none(), statusUser);
 router.delete("/delete/:id", multer().none(), destroy);
 
 export default router;

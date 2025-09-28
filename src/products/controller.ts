@@ -144,8 +144,8 @@ async function index(req: Request, res: Response, next: NextFunction) {
 
     const count = await Product.countDocuments(criteria);
     const products = await Product.find(criteria)
-      .limit(parseInt(limit as string))
-      .skip(parseInt(skip as string))
+      .limit(Number(limit))
+      .skip(Number(skip))
       .populate("category", "name")
       .populate("tags", "name");
 

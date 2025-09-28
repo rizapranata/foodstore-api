@@ -12,6 +12,7 @@ import deliveryAddressRouter from "./delivery-address/router";
 import cartRouter from "./cart/router";
 import orderRouter from "./order/router";
 import invoiceRouter from "./invoice/router";
+import userRouter from "./user/router";
 import cors from "cors";
 
 const app = express();
@@ -38,6 +39,7 @@ app.use("/api", deliveryAddressRouter);
 app.use("/api", cartRouter);
 app.use("/api", orderRouter);
 app.use("/api", invoiceRouter);
+app.use("/api", userRouter);
 
 app.listen(port, () => {
   logger.info(`🚀 Server is running on port ${port}`);

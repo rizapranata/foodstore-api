@@ -185,48 +185,6 @@ async function index(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-async function statusUser(req: Request, res: Response, next: NextFunction) {
-  try {
-    const policy = policyFor(req.user as UserTypes);
-    if (!policy.can("update", "User")) {
-      return res.status(403).json({
-        error: 1,
-        message: "You are not allowed to update a User",
-      });
-    }
-
-    const { id } = req.params;
-    const { is_active } = req.body;
-
-    // update hanya field is_active
-    const user = await User.findOneAndUpdate(
-      { _id: id }, // filter cukup pakai id
-      { is_active }, // hanya update is_active
-      { new: true, runValidators: true }
-    );
-
-    if (!user) {
-      return res.status(404).json({
-        status: "error",
-        message: "User not found",
-      });
-    }
-
-    return res.status(200).json({
-      status: "success",
-      message: "Success update status user!",
-    });
-  } catch (error) {
-    if (error instanceof mongoose.Error.ValidationError) {
-      return res.status(400).json({
-        status: "error",
-        message: error.message,
-      });
-    }
-    next(error);
-  }
-}
-
 async function destroy(req: Request, res: Response, next: NextFunction) {
   const policy = policyFor(req.user as UserTypes);
   if (!policy.can("delete", "User")) {
@@ -271,6 +229,5 @@ export {
   me,
   logout,
   index,
-  statusUser,
   destroy,
 };
