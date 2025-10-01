@@ -14,6 +14,7 @@ import orderRouter from "./order/router";
 import invoiceRouter from "./invoice/router";
 import userRouter from "./user/router";
 import cors from "cors";
+import { UPLOAD_DIR } from "./config";
 
 const app = express();
 const port = 3001;
@@ -29,6 +30,7 @@ app.use(cors(FE));
 app.use(loging);
 app.use(express.json());
 app.use(decodeToken());
+app.use("/uploads", express.static(UPLOAD_DIR));
 
 app.use("/auth", authRouter);
 app.use("/api", producRouter);

@@ -104,4 +104,31 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store, update, destroy };
+async function index(req: Request, res: Response, next: NextFunction) {
+  const policy = policyFor(req.user as UserTypes);
+  if (!policy.can("view", "Category")) {
+    return res.status(403).json({
+      error: 1,
+      message: "You are not allowed to read a User",
+    });
+  }
+
+  try {
+    const categories = await Category.find();
+
+    res.status(200).json({
+      status: "success",
+      data: categories,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export { store, update, destroy, index };

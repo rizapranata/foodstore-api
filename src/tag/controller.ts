@@ -2,7 +2,7 @@ import { Request, Response, NextFunction } from "express";
 import mongoose from "mongoose";
 import Tag from "./model";
 import { policyFor } from "../policy";
-import UserTypes from "../utils/userTypes";
+import { UserTypes } from "../types/user.types";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   try {
@@ -83,7 +83,7 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
         message: "You are not allowed to delete a tag",
       });
     }
-    
+
     const { id } = req.params;
     let tag = await Tag.findOneAndDelete({ _id: id });
 
@@ -103,4 +103,31 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store, update, destroy };
+async function index(req: Request, res: Response, next: NextFunction) {
+  const policy = policyFor(req.user as UserTypes);
+  if (!policy.can("view", "Tag")) {
+    return res.status(403).json({
+      error: 1,
+      message: "You are not allowed to read a User",
+    });
+  }
+
+  try {
+    const tags = await Tag.find();
+
+    res.status(200).json({
+      status: "success",
+      data: tags,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export { store, update, destroy, index };
