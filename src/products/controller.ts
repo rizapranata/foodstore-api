@@ -123,17 +123,26 @@ async function index(req: Request, res: Response, next: NextFunction) {
 
     if (typeof category === "string" && category.length) {
       const categoryDoc = await Category.findOne({
-        name: { $regex: category, $options: "i" },
+        _id: category,
       });
       if (categoryDoc) {
         criteria = { ...criteria, category: categoryDoc._id };
       }
     }
 
+    // Normalisasi tags → array string
+    if (typeof tags === "string") {
+      // Kalau format CSV: "dingin,manis"
+      tags = tags.split(",").map((t) => t.trim());
+    } else if (!Array.isArray(tags)) {
+      tags = [];
+    }
+
     if (Array.isArray(tags) && tags.length > 0) {
       const tagDocs = await Tag.find({
         name: { $in: tags },
       });
+
       if (tagDocs.length) {
         criteria = {
           ...criteria,
