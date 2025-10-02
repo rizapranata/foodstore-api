@@ -3,7 +3,7 @@ import mongoose, { Model, Schema, Document } from "mongoose";
 export interface ProductTypes extends Document {
   name: string;
   price: number;
-  description?: string;
+  discount?: number;
   image_url: string;
   category: mongoose.Types.ObjectId;
   tags: mongoose.Types.ObjectId[];
@@ -21,9 +21,9 @@ const productSchema = new Schema<ProductTypes>(
       type: Number,
       default: 0,
     },
-    description: {
-      type: String,
-      maxlength: [1000, "Panjang deskripsi maksimal 1000 karakter"],
+    discount: {
+      type: Number,
+      default: 0,
     },
     image_url: {
       type: String,

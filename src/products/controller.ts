@@ -22,7 +22,7 @@ async function store(req: Request, res: Response, next: NextFunction) {
     let payload = req.body;
     if (payload.category) {
       const category = await Category.findOne({
-        name: { $regex: payload.category, $options: "i" },
+        _id: payload.category,
       });
 
       if (category) {
