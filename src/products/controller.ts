@@ -36,7 +36,7 @@ async function store(req: Request, res: Response, next: NextFunction) {
       payload.tags = [payload.tags]; // convert single tag jadi array
     }
 
-    if (payload.tags.length > 0) {
+    if (payload.tags && payload.tags.length > 0) {
       const tags = await Tag.find({
         name: { $in: payload.tags.map((tag: string) => tag.trim()) },
       });
@@ -321,4 +321,42 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
   }
 }
 
-export { store, index, update, destroy };
+async function detail(req: Request, res: Response, next: NextFunction) {
+  const policy = policyFor(req.user as UserTypes);
+  if (!policy.can("read", "Product")) {
+    return res.status(403).json({
+      error: 1,
+      message: "You are not allowed to create a User",
+    });
+  }
+
+  try {
+    const { id } = req.params;
+    const product = await Product.findOne({
+      _id: id,
+    });
+
+    if (!product) {
+      return res.status(404).json({
+        status: "error",
+        message: "Product not fount!",
+      });
+    }
+
+    return res.status(200).json({
+      satatus: "success",
+      message: "success get product data.",
+      data: product,
+    });
+  } catch (error) {
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
+export { store, index, update, destroy, detail };

@@ -1,7 +1,7 @@
 import Router from "express";
 import os from "os";
 import multer from "multer";
-import { store, index, update, destroy } from "./controller";
+import { store, index, update, destroy, detail } from "./controller";
 
 const router = Router();
 router.post("/products", multer({ dest: os.tmpdir() }).single("image"), store);
@@ -12,5 +12,6 @@ router.put(
   update
 );
 router.delete("/products/:id", destroy);
+router.get("/products/:id", detail);
 
 export default router;
