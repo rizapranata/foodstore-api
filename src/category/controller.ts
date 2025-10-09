@@ -90,7 +90,6 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
     return res.status(200).json({
       status: "success",
       message: "Category deleted successfully",
-      data: category,
     });
   } catch (error) {
     if (error instanceof mongoose.Error.ValidationError) {

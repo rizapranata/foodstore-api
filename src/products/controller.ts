@@ -36,7 +36,7 @@ async function store(req: Request, res: Response, next: NextFunction) {
       payload.tags = [payload.tags]; // convert single tag jadi array
     }
 
-    if (payload.tags && payload.tags.length > 0) {
+    if (payload.tags?.length > 0) {
       const tags = await Tag.find({
         name: { $in: payload.tags.map((tag: string) => tag.trim()) },
       });
