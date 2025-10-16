@@ -3,6 +3,7 @@ import { policyFor } from "../policy";
 import { UserTypes } from "../types/user.types";
 import mongoose from "mongoose";
 import User from "./model";
+import bcrypt from "bcrypt";
 
 async function store(req: Request, res: Response, next: NextFunction) {
   const policy = policyFor(req.user as UserTypes);
@@ -91,6 +92,11 @@ async function update(req: Request, res: Response, next: NextFunction) {
   try {
     const { id } = req.params;
     const payload: UserTypes = req.body;
+
+    if (payload.password) {
+      const salt = await bcrypt.genSalt(10);
+      payload.password = await bcrypt.hash(payload.password, salt);
+    }
 
     const user = await User.findByIdAndUpdate(id, payload, { new: true });
     if (!user) {

@@ -54,10 +54,14 @@ async function localStrategy(email: string, password: string, done: Function) {
     if (!user) {
       return done(null, false, { message: "User not found" });
     }
-    if (bcrypt.compareSync(password, user.password)) {
-      const { password, ...userWithoutPassword } = user.toObject();
-      return done(null, userWithoutPassword);
+
+    const isMatch = bcrypt.compareSync(password, user.password);
+    if (!isMatch) {
+      return done(null, false, { message: "Invalid password" });
     }
+
+    const { password: _, ...userWithoutPassword } = user.toObject();
+    return done(null, userWithoutPassword);
   } catch (error) {
     if (error instanceof mongoose.Error.ValidationError) {
       return done(error, false, { message: "Validation error" });
@@ -222,6 +226,67 @@ async function destroy(req: Request, res: Response, next: NextFunction) {
   }
 }
 
+async function changePassword(req: Request, res: Response, next: NextFunction) {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = (req.user as { _id: string })?._id;
+
+    // 1. Validasi input
+    if (!currentPassword || !newPassword) {
+      return res.status(400).json({
+        status: "error",
+        message: "Current password and new password are required",
+      });
+    }
+
+    // 2. Cari user berdasarkan ID
+    const user = await User.findById(userId);
+    if (!user) {
+      return res.status(404).json({
+        status: "error",
+        message: "User not found",
+      });
+    }
+
+    // 3. Cek apakah current password valid
+    const isCurrentValid = await bcrypt.compare(currentPassword, user.password);
+    if (!isCurrentValid) {
+      return res.status(400).json({
+        status: "error",
+        message: "Current password is incorrect",
+      });
+    }
+
+    // 4. Pastikan password baru berbeda dari lama
+    const isSamePassword = await bcrypt.compare(newPassword, user.password);
+    if (isSamePassword) {
+      return res.status(400).json({
+        status: "error",
+        message: "New password cannot be the same as the old password",
+      });
+    }
+
+    // 5. hashing password dilakukan di model
+    user.password = newPassword;
+    await user.save();
+
+    // 6. Respon sukses
+    return res.status(200).json({
+      status: "success",
+      message: "Password changed successfully, please login again",
+    });
+  } catch (error) {
+    // 7. Error handling rapi
+    if (error instanceof mongoose.Error.ValidationError) {
+      return res.status(400).json({
+        status: "error",
+        message: error.message,
+      });
+    }
+    next(error);
+  }
+}
+
 export {
   register,
   localStrategy,
@@ -230,4 +295,5 @@ export {
   logout,
   index,
   destroy,
+  changePassword,
 };

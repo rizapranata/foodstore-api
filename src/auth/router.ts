@@ -10,6 +10,7 @@ import {
   destroy,
   index,
   localStrategy,
+  changePassword
 } from "./constroller";
 
 const LocalStrategy = passportLocal.Strategy;
@@ -22,5 +23,6 @@ router.get("/me", me);
 router.post("/logout", logout);
 router.get("/users", index);
 router.delete("/delete/:id", multer().none(), destroy);
+router.put("/change-password", multer().none(), changePassword);
 
 export default router;
