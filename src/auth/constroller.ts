@@ -68,7 +68,6 @@ async function localStrategy(email: string, password: string, done: Function) {
     }
     return done(error);
   }
-  done();
 }
 
 async function login(req: Request, res: Response, next: NextFunction) {
